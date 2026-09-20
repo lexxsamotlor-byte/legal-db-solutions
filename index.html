@@ -1,0 +1,754 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- === ОСНОВНЫЕ === -->
+    <title>Решения по базам данных для юридических компаний (2025–2026)</title>
+    <meta name="description" content="Обзор текущих архитектур, технологий и подходов к хранению юридических данных — от локальных SQLite до графовых и векторных баз для RAG-систем.">
+    <meta name="author" content="lexxsamotlor-byte">
+    <meta name="keywords" content="юридические базы данных, RAG, pgvector, Qdrant, iManage, DMS, legaltech, SQLite, Neo4j">
+
+    <!-- === OPEN GRAPH (Discord, Telegram, Facebook, LinkedIn) === -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://lexxsamotlor-byte.github.io/legal-db-solutions/">
+    <meta property="og:title" content="🗄️ Решения по базам данных для юридических компаний">
+    <meta property="og:description" content="От SQLite для solo-практик до графовых и векторных БД для RAG. Гибридные архитектуры, DMS, безопасность и compliance — обзор 2025–2026.">
+    <meta property="og:image" content="https://lexxsamotlor-byte.github.io/legal-db-solutions/preview.png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="Визуализация решений по базам данных для юридических компаний">
+    <meta property="og:site_name" content="Legal DB Solutions">
+    <meta property="og:locale" content="ru_RU">
+
+    <!-- === TWITTER CARD (на случай кросс-постинга в X) === -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="🗄️ Решения по базам данных для юридических компаний">
+    <meta name="twitter:description" content="SQLite, pgvector, Qdrant, LanceDB, Neo4j, iManage — обзор архитектур для legaltech 2025–2026.">
+    <meta name="twitter:image" content="https://lexxsamotlor-byte.github.io/legal-db-solutions/preview.png">
+
+    <!-- === ИКОНКА === -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🗄️</text></svg>">
+    <meta name="theme-color" content="#0f3460">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f0f2f5;
+            color: #1a1a2e;
+            line-height: 1.6;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        header {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            color: #fff;
+            padding: 40px 30px;
+            border-radius: 16px;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+        }
+        header h1 {
+            font-size: 2.2rem;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+        header p {
+            font-size: 1.05rem;
+            opacity: 0.85;
+            max-width: 800px;
+        }
+        .badge {
+            display: inline-block;
+            background: rgba(255, 255, 255, 0.15);
+            padding: 4px 14px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            margin-top: 12px;
+            letter-spacing: 0.5px;
+        }
+
+        /* Секции */
+        .section {
+            margin-bottom: 40px;
+        }
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #0f3460;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .section-title .icon {
+            font-size: 1.6rem;
+        }
+
+        /* Карточки */
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 20px;
+        }
+        .card {
+            background: #fff;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.07);
+            transition: transform 0.2s, box-shadow 0.2s;
+            border-left: 5px solid #0f3460;
+        }
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+        }
+        .card h3 {
+            font-size: 1.15rem;
+            margin-bottom: 8px;
+            color: #0f3460;
+        }
+        .card .subtitle {
+            font-size: 0.8rem;
+            color: #666;
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .card p {
+            font-size: 0.9rem;
+            color: #444;
+            margin-bottom: 12px;
+        }
+        .card ul {
+            list-style: none;
+            padding: 0;
+        }
+        .card ul li {
+            font-size: 0.85rem;
+            padding: 4px 0 4px 18px;
+            position: relative;
+            color: #555;
+        }
+        .card ul li::before {
+            content: '▸';
+            position: absolute;
+            left: 0;
+            color: #0f3460;
+            font-weight: bold;
+        }
+
+        /* Цветовые метки */
+        .tag {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-right: 6px;
+            margin-bottom: 4px;
+        }
+        .tag-sql { background: #e3f2fd; color: #1565c0; }
+        .tag-nosql { background: #fce4ec; color: #c62828; }
+        .tag-vector { background: #e8f5e9; color: #2e7d32; }
+        .tag-graph { background: #fff3e0; color: #e65100; }
+        .tag-cloud { background: #f3e5f5; color: #6a1b9a; }
+        .tag-dms { background: #e0f7fa; color: #00695c; }
+        .tag-local { background: #f9fbe7; color: #827717; }
+
+        /* Таблица сравнения */
+        .table-wrap {
+            overflow-x: auto;
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.07);
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.88rem;
+        }
+        thead {
+            background: #1a1a2e;
+            color: #fff;
+        }
+        th {
+            padding: 14px 16px;
+            text-align: left;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+        td {
+            padding: 12px 16px;
+            border-bottom: 1px solid #eee;
+            vertical-align: top;
+        }
+        tbody tr:hover {
+            background: #f8f9fa;
+        }
+
+        /* Блоки-рекомендации */
+        .recommendation {
+            background: linear-gradient(135deg, #e8f5e9 0%, #e0f7fa 100%);
+            border-radius: 12px;
+            padding: 24px;
+            margin-top: 20px;
+            border-left: 5px solid #2e7d32;
+        }
+        .recommendation h4 {
+            color: #1b5e20;
+            margin-bottom: 10px;
+        }
+        .recommendation p {
+            font-size: 0.92rem;
+            color: #333;
+        }
+
+        /* Блок-предупреждение */
+        .warning {
+            background: #fff8e1;
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 16px;
+            border-left: 5px solid #f9a825;
+            font-size: 0.9rem;
+        }
+        .warning strong {
+            color: #e65100;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 30px 0 10px;
+            color: #888;
+            font-size: 0.85rem;
+        }
+
+        @media (max-width: 768px) {
+            header h1 { font-size: 1.5rem; }
+            .card-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+
+    <!-- HEADER -->
+    <header>
+        <h1>🗄️ Решения по базам данных для юридических компаний</h1>
+        <p>Обзор текущих архитектур, технологий и подходов к хранению и обработке юридических данных — от локальных SQLite до графовых и векторных баз для RAG-систем.</p>
+        <span class="badge">Актуально на 2025–2026 гг.</span>
+    </header>
+
+    <!-- 1. ТРАДИЦИОННЫЕ РЕЛЯЦИОННЫЕ СУБД -->
+    <section class="section">
+        <div class="section-title">
+            <span class="icon">🔷</span> Традиционные реляционные СУБД (SQL)
+        </div>
+        <div class="card-grid">
+
+            <div class="card">
+                <h3>Microsoft SQL Server</h3>
+                <div class="subtitle">Корпоративный стандарт</div>
+                <p>Основной бэкенд для DMS, CRM, биллинга и e-discovery в юридических фирмах. Обеспечивает шифрование, ролевой доступ и аудит.</p>
+                <ul>
+                    <li>Управление документами и делами</li>
+                    <li>CRM и биллинг</li>
+                    <li>E-discovery и литигация</li>
+                    <li>Соответствие GDPR, HIPAA</li>
+                </ul>
+                <div style="margin-top:12px;">
+                    <span class="tag tag-sql">SQL</span>
+                    <span class="tag tag-cloud">On-Prem / Azure</span>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>PostgreSQL</h3>
+                <div class="subtitle">Открытый стандарт с расширениями</div>
+                <p>Широко используется в legal-tech стартапах. С расширением <strong>pgvector</strong> поддерживает семантический поиск по миллиардам документов.</p>
+                <ul>
+                    <li>CORTO: 7,6 млрд векторов в Aurora PostgreSQL</li>
+                    <li>Мультитенантность для тысяч фирм</li>
+                    <li>pgvector для RAG-систем</li>
+                </ul>
+                <div style="margin-top:12px;">
+                    <span class="tag tag-sql">SQL</span>
+                    <span class="tag tag-vector">Vector</span>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>Oracle Database</h3>
+                <div class="subtitle">Классика корпоративного сектора</div>
+                <p>Исторически использовалась в крупных юридических фирмах для финансовых и аналитических систем. Медленные отчёты часто связаны с плохим SQL, а не с СУБД.</p>
+                <ul>
+                    <li>Финансовая аналитика</li>
+                    <li>Хранилища данных (DWH)</li>
+                    <li>OLAP-отчёты</li>
+                </ul>
+                <div style="margin-top:12px;">
+                    <span class="tag tag-sql">SQL</span>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>SQLite</h3>
+                <div class="subtitle">Локальная база для малых фирм</div>
+                <p>Для сolo- и малых практик (1–3 юриста) одного файла SQLite достаточно для управления делами, документами и событиями. Нулевые затраты на администрирование.</p>
+                <ul>
+                    <li>Один файл — вся база</li>
+                    <li>Резервное копирование = копирование файла</li>
+                    <li>Нет сетевого слушателя → меньше поверхности атаки</li>
+                </ul>
+                <div style="margin-top:12px;">
+                    <span class="tag tag-sql">SQL</span>
+                    <span class="tag tag-local">Local-first</span>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>Platform V Pangolin DB</h3>
+                <div class="subtitle">Российская СУБД для адвокатуры</div>
+                <p>На базе PostgreSQL с 80+ доработками. Сертификат ФСТЭК России. Стала ядром КИС АР для 110 000+ пользователей.</p>
+                <ul>
+                    <li>Федеральная палата адвокатов РФ</li>
+                    <li>Интеграция с госорганами</li>
+                    <li>Импортозамещение</li>
+                </ul>
+                <div style="margin-top:12px;">
+                    <span class="tag tag-sql">SQL</span>
+                    <span class="tag tag-cloud">On-Prem</span>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>SQLBase (Gupta)</h3>
+                <div class="subtitle">Специализированное решение</div>
+                <p>Используется в решении Advo-Ware для юристов. Не требует администрирования, что упрощает установку и обслуживание в юридических фирмах.</p>
+                <ul>
+                    <li>Advo-Ware для юристов</li>
+                    <li>Минимальное администрирование</li>
+                </ul>
+                <div style="margin-top:12px;">
+                    <span class="tag tag-sql">SQL</span>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- 2. ВЕКТОРНЫЕ БАЗЫ ДАННЫХ -->
+    <section class="section">
+        <div class="section-title">
+            <span class="icon">🧠</span> Векторные базы данных (для RAG и семантического поиска)
+        </div>
+        <div class="card-grid">
+
+            <div class="card">
+                <h3>pgvector (PostgreSQL)</h3>
+                <div class="subtitle">Расширение для реляционной СУБД</div>
+                <p>Позволяет хранить эмбеддинги прямо в PostgreSQL. CORTO использует 7,6 млрд векторов в 46 ТБ кластере Aurora PostgreSQL.</p>
+                <ul>
+                    <li>Мультитенантная изоляция</li>
+                    <li>Субсекундные запросы</li>
+                    <li>Компактные эмбеддинги для экономии</li>
+                </ul>
+                <div style="margin-top:12px;">
+                    <span class="tag tag-vector">Vector</span>
+                    <span class="tag tag-sql">SQL</span>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>Qdrant</h3>
+                <div class="subtitle">Высокопроизводительный векторный поиск</div>
+                <p>Lawme.ai мигрировала с pgvector на Qdrant и сократила затраты на инфраструктуру на 75%. Поддерживает бинарную квантизацию и метаданные-фильтрацию.</p>
+                <ul>
+                    <li>Бинарная квантизация</li>
+                    <li>HNSW-индекс с фильтрацией по юрисдикции</li>
+                    <li>Kubernetes-развёртывание в приватном облаке</li>
+                </ul>
+                <div style="margin-top:12px;">
+                    <span class="tag tag-vector">Vector</span>
+                    <span class="tag tag-cloud">Cloud / On-Prem</span>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>LanceDB</h3>
+                <div class="subtitle">Выбор Harvey AI</div>
+                <p>Harvey (700+ клиентов в 58 странах) выбрал LanceDB для production-RAG. Обеспечивает мультимодальную обработку данных.</p>
+                <ul>
+                    <li>Мультимодальные данные</li>
+                    <li>Крупномасштабный RAG</li>
+                </ul>
+                <div style="margin-top:12px;">
+                    <span class="tag tag-vector">Vector</span>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>Milvus / Zilliz Cloud</h3>
+                <div class="subtitle">Open-source векторная БД</div>
+                <p>Filevine управляет 3+ млрд векторов для 100+ тыс. клиентов, экономя 60–80% времени юристов.</p>
+                <ul>
+                    <li>3+ млрд векторов</li>
+                    <li>Управление делами и документами</li>
+                </ul>
+                <div style="margin-top:12px;">
+                    <span class="tag tag-vector">Vector</span>
+                    <span class="tag tag-cloud">Cloud</span>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>ChromaDB</h3>
+                <div class="subtitle">Легковесная векторная БД</div>
+                <p>Используется в локальных RAG-решениях для юридических фирм. Подходит для self-hosted ассистентов без передачи данных в облако.</p>
+                <ul>
+                    <li>Self-hosted Q&A по документам</li>
+                    <li>Без внешних API</li>
+                </ul>
+                <div style="margin-top:12px;">
+                    <span class="tag tag-vector">Vector</span>
+                    <span class="tag tag-local">Local</span>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>Astra DB (IBM watsonx.data)</h3>
+                <div class="subtitle">Векторная БД для production RAG</div>
+                <p>Shorthills AI достиг 60% улучшения recall и precision при поиске по юридическим данным.</p>
+                <ul>
+                    <li>Production RAG для legal search</li>
+                    <li>Интеграция с Langflow</li>
+                </ul>
+                <div style="margin-top:12px;">
+                    <span class="tag tag-vector">Vector</span>
+                    <span class="tag tag-cloud">Cloud</span>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- 3. ГРАФОВЫЕ И NOSQL БАЗЫ -->
+    <section class="section">
+        <div class="section-title">
+            <span class="icon">🕸️</span> Графовые и NoSQL базы данных
+        </div>
+        <div class="card-grid">
+
+            <div class="card">
+                <h3>Neo4j</h3>
+                <div class="subtitle">Графовая БД для знаний</div>
+                <p>Используется для построения knowledge graphs из юридических документов и GraphRAG-архитектур. Позволяет отслеживать связи между делами, прецедентами и контрактами.</p>
+                <ul>
+                    <li>GraphRAG для юридического reasoning</li>
+                    <li>Полная прослеживаемость контрактов</li>
+                    <li>Структурирование законодательства</li>
+                </ul>
+                <div style="margin-top:12px;">
+                    <span class="tag tag-graph">Graph</span>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>MarkLogic</h3>
+                <div class="subtitle">Мультимодельная NoSQL</div>
+                <p>Национальный архив использует MarkLogic для публичного портала судебных решений. Document-oriented база для цифрового правосудия.</p>
+                <ul>
+                    <li>Публичный доступ к судебным решениям</li>
+                    <li>Метаданные и полнотекстовый поиск</li>
+                </ul>
+                <div style="margin-top:12px;">
+                    <span class="tag tag-nosql">NoSQL</span>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>Azure Cosmos DB</h3>
+                <div class="subtitle">Глобально распределённая NoSQL</div>
+                <p>Для мультирегиональных юридических компаний с требованиями к соблюдению нормативов в разных юрисдикциях.</p>
+                <ul>
+                    <li>Глобальное распределение</li>
+                    <li>Соответствие регуляторным требованиям</li>
+                </ul>
+                <div style="margin-top:12px;">
+                    <span class="tag tag-nosql">NoSQL</span>
+                    <span class="tag tag-cloud">Cloud</span>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>Cloud Firestore</h3>
+                <div class="subtitle">Real-time база для legal-tech</div>
+                <p>LegalEase AI использует Firestore для хранения дел, документов и транскриптов с real-time синхронизацией.</p>
+                <ul>
+                    <li>Real-time синхронизация</li>
+                    <li>Cloud-native архитектура</li>
+                </ul>
+                <div style="margin-top:12px;">
+                    <span class="tag tag-nosql">NoSQL</span>
+                    <span class="tag tag-cloud">Cloud</span>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- 4. ОБЛАЧНЫЕ ПЛАТФОРМЫ И DMS -->
+    <section class="section">
+        <div class="section-title">
+            <span class="icon">📁</span> Системы управления документами (DMS) и облачные платформы
+        </div>
+        <div class="card-grid">
+
+            <div class="card">
+                <h3>iManage</h3>
+                <div class="subtitle">Лидер юридических DMS</div>
+                <p>Matter-centric организация документов. Конфигурация: £10,000–£25,000 + £5–15/пользователь/мес. за сторонние дополнения.</p>
+                <ul>
+                    <li>Matter-centric подход</li>
+                    <li>Интеграция с Outlook, OneDrive</li>
+                </ul>
+                <div style="margin-top:12px;">
+                    <span class="tag tag-dms">DMS</span>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>NetDocuments</h3>
+                <div class="subtitle">Облачный DMS</div>
+                <p>Альтернатива iManage с облачной архитектурой. Поддерживает совместную работу и интеграции с практическими системами.</p>
+                <ul>
+                    <li>Облачная архитектура</li>
+                    <li>Совместная работа</li>
+                </ul>
+                <div style="margin-top:12px;">
+                    <span class="tag tag-dms">DMS</span>
+                    <span class="tag tag-cloud">Cloud</span>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>Clio</h3>
+                <div class="subtitle">All-in-one практическая платформа</div>
+                <p>Более 150 000 юристов. Включает DMS, практическое управление, биллинг и интеграции с QuickBooks, Outlook и OneDrive.</p>
+                <ul>
+                    <li>Практическое управление</li>
+                    <li>Биллинг и выставление счетов</li>
+                    <li>Клиентский портал</li>
+                </ul>
+                <div style="margin-top:12px;">
+                    <span class="tag tag-dms">DMS</span>
+                    <span class="tag tag-cloud">Cloud</span>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>Centerbase</h3>
+                <div class="subtitle">DMS внутри all-in-one</div>
+                <p>Встроенный DMS в комплексную платформу для фирм среднего размера. Автоматизация рутинных задач.</p>
+                <ul>
+                    <li>Автоматизация делопроизводства</li>
+                    <li>Средние фирмы</li>
+                </ul>
+                <div style="margin-top:12px;">
+                    <span class="tag tag-dms">DMS</span>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>HighQ (Thomson Reuters)</h3>
+                <div class="subtitle">Централизованное хранилище знаний</div>
+                <p>Центральный репозиторий для прецедентов, шаблонов и лучших практик. Банковский уровень безопасности для виртуальных data room.</p>
+                <ul>
+                    <li>Библиотека шаблонов</li>
+                    <li>Виртуальные data room</li>
+                    <li>Безопасный обмен документами</li>
+                </ul>
+                <div style="margin-top:12px;">
+                    <span class="tag tag-dms">DMS</span>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>Sidebar by SpotDraft</h3>
+                <div class="subtitle">Управление контрактами</div>
+                <p>Централизованный репозиторий контрактов с полнотекстовым поиском, фильтрацией по метаданным и библиотекой предодобренных шаблонов.</p>
+                <ul>
+                    <li>Полнотекстовый поиск</li>
+                    <li>Библиотека шаблонов</li>
+                    <li>Управление рисками</li>
+                </ul>
+                <div style="margin-top:12px;">
+                    <span class="tag tag-dms">DMS</span>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- 5. СРАВНИТЕЛЬНАЯ ТАБЛИЦА -->
+    <section class="section">
+        <div class="section-title">
+            <span class="icon">📊</span> Сводная таблица сравнения
+        </div>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Решение</th>
+                        <th>Тип</th>
+                        <th>Масштаб</th>
+                        <th>Ключевое преимущество</th>
+                        <th>Кому подходит</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>SQLite</strong></td>
+                        <td>Реляционная</td>
+                        <td>1–3 юриста</td>
+                        <td>Нулевое администрирование, один файл</td>
+                        <td>Малые практики, solo</td>
+                    </tr>
+                    <tr>
+                        <td><strong>PostgreSQL + pgvector</strong></td>
+                        <td>Реляционная + векторная</td>
+                        <td>Средние и крупные фирмы</td>
+                        <td>Единая БД для SQL и семантического поиска</td>
+                        <td>Legal-tech платформы</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MS SQL Server</strong></td>
+                        <td>Реляционная</td>
+                        <td>Средние и крупные</td>
+                        <td>Зрелая экосистема, безопасность</td>
+                        <td>Традиционные фирмы</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Oracle</strong></td>
+                        <td>Реляционная</td>
+                        <td>Крупные корпорации</td>
+                        <td>OLAP, аналитика, DWH</td>
+                        <td>Крупные юрфирмы</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Qdrant</strong></td>
+                        <td>Векторная</td>
+                        <td>Любой</td>
+                        <td>Снижение затрат на 75%, бинарная квантизация</td>
+                        <td>Legal AI стартапы</td>
+                    </tr>
+                    <tr>
+                        <td><strong>LanceDB</strong></td>
+                        <td>Векторная</td>
+                        <td>Крупные</td>
+                        <td>Мультимодальный RAG</td>
+                        <td>Harvey AI (700+ клиентов)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Neo4j</strong></td>
+                        <td>Графовая</td>
+                        <td>Средние и крупные</td>
+                        <td>GraphRAG, связи между документами</td>
+                        <td>Анализ прецедентов</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Platform V Pangolin</strong></td>
+                        <td>Реляционная (PostgreSQL)</td>
+                        <td>110 000+ пользователей</td>
+                        <td>ФСТЭК, импортозамещение</td>
+                        <td>Российская адвокатура</td>
+                    </tr>
+                    <tr>
+                        <td><strong>iManage / NetDocuments</strong></td>
+                        <td>DMS</td>
+                        <td>Средние и крупные</td>
+                        <td>Matter-centric, интеграции</td>
+                        <td>Юридические фирмы</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Clio</strong></td>
+                        <td>All-in-one</td>
+                        <td>Любой</td>
+                        <td>150 000+ юристов, экосистема</td>
+                        <td>Практическое управление</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- 6. РЕКОМЕНДАЦИИ -->
+    <section class="section">
+        <div class="section-title">
+            <span class="icon">💡</span> Практические рекомендации по выбору
+        </div>
+
+        <div class="recommendation">
+            <h4>🏢 Для малой юридической практики (1–5 юристов)</h4>
+            <p>Начните с <strong>SQLite</strong> для структурированных данных и файловой системы для документов. Это даёт нулевые затраты на администрирование, простоту резервного копирования и минимальную поверхность атаки. Для семантического поиска по документам можно добавить локальный <strong>ChromaDB</strong> с self-hosted LLM.</p>
+        </div>
+
+        <div class="recommendation" style="background: linear-gradient(135deg, #e3f2fd 0%, #e8eaf6 100%); border-left-color: #1565c0;">
+            <h4 style="color: #0d47a1;">🏛️ Для средней фирмы (5–50 юристов)</h4>
+            <p>Оптимальный выбор — <strong>PostgreSQL + pgvector</strong> как единая база для транзакционных данных и семантического поиска. Это позволяет избежать фрагментации данных между SQL и векторной БД. Для документооборота — <strong>iManage</strong> или <strong>NetDocuments</strong> с интеграцией в практическую систему.</p>
+        </div>
+
+        <div class="recommendation" style="background: linear-gradient(135deg, #fce4ec 0%, #fff3e0 100%); border-left-color: #c62828;">
+            <h4 style="color: #b71c1c;">🌐 Для крупной фирмы / корпоративного юротдела</h4>
+            <p>Гибридная архитектура: <strong>MS SQL Server</strong> или <strong>Oracle</strong> для финансовых и аналитических систем + <strong>векторная БД</strong> (Qdrant, LanceDB) для RAG-поиска по миллиардам документов + <strong>Neo4j</strong> для графа знаний и анализа связей между делами. Для DMS — <strong>HighQ</strong> или <strong>iManage</strong>.</p>
+        </div>
+
+        <div class="recommendation" style="background: linear-gradient(135deg, #e8f5e9 0%, #f1f8e9 100%); border-left-color: #2e7d32;">
+            <h4 style="color: #1b5e20;">🇷🇺 Для российской юридической фирмы</h4>
+            <p>С учётом требований регуляторов и импортозамещения: <strong>Platform V Pangolin DB</strong> (сертификат ФСТЭК) как ядро системы + <strong>SQLite</strong> или <strong>PostgreSQL</strong> для локальных задач. Для DMS — решения с поддержкой ФСТЭК и возможностью развёртывания on-premise.</p>
+        </div>
+    </section>
+
+    <!-- 7. КЛЮЧЕВЫЕ ВЫВОДЫ -->
+    <section class="section">
+        <div class="section-title">
+            <span class="icon">📌</span> Ключевые выводы
+        </div>
+        <div class="card-grid">
+            <div class="card" style="border-left-color: #f9a825;">
+                <h3>⚖️ Нет универсального решения</h3>
+                <p>Выбор зависит от размера фирмы, объёма данных, требований к безопасности и наличия сценариев семантического поиска. SQL остаётся основой, векторные и графовые БД дополняют её.</p>
+            </div>
+            <div class="card" style="border-left-color: #1565c0;">
+                <h3>🔗 Гибридные архитектуры побеждают</h3>
+                <p>Наиболее эффективные решения 2025–2026 гг. — это комбинации: PostgreSQL + pgvector, SQL + векторная БД, DMS + граф знаний. Чистые «монолитные» подходы уступают место гибридам.</p>
+            </div>
+            <div class="card" style="border-left-color: #2e7d32;">
+                <h3>🔐 Безопасность и compliance — приоритет</h3>
+                <p>Юридические данные требуют шифрования, ролевого доступа, аудита и соблюдения GDPR, HIPAA, ФСТЭК. Выбор БД всё чаще определяется не производительностью, а соответствием регуляторным требованиям.</p>
+            </div>
+            <div class="card" style="border-left-color: #6a1b9a;">
+                <h3>🤖 RAG меняет требования к БД</h3>
+                <p>Юридические фирмы всё чаще используют RAG-системы для поиска по документам. Это привело к росту популярности векторных БД и расширений вроде pgvector, которые позволяют не менять существующий стек.</p>
+            </div>
+        </div>
+    </section>
+
+    <div class="footer">
+        <p>Обзор составлен на основе публичных данных 2025–2026 гг. • Для выбора конкретного решения рекомендуется провести пилотное тестирование.</p>
+    </div>
+
+</div>
+</body>
+</html>
